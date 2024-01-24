@@ -11,6 +11,8 @@ bl_info = {
 }
 
 import bpy
+import json
+from urllib import request
 
 class MaterialItem(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Material Name")
@@ -95,12 +97,44 @@ class ImportMaterialsPanel(bpy.types.Panel):
             op = row.operator(ApplyMaterialOperator.bl_idname, text="Apply")
             op.material_name = item.name
 
+def check_for_update():
+    current_version = bl_info['version']
+    url = "https://api.github.com/repos/your_username/your_repository/releases/latest"
+    try:
+        with request.urlopen(url) as response:
+            data = json.loads(response.read().decode())
+            latest_version = tuple(map(int, data['tag_name'].split('.')))
+            return latest_version > current_version
+    except Exception as e:
+        print("Error checking for update:", e)
+        return False
+
+update_available = False
+
 def register():
+    global update_available
+    update_available = check_for_update()
     bpy.utils.register_class(MaterialItem)
     bpy.types.Scene.imported_materials = bpy.props.CollectionProperty(type=MaterialItem)
     bpy.utils.register_class(ImportMaterialsOperator)
     bpy.utils.register_class(ApplyMaterialOperator)
     bpy.utils.register_class(ImportMaterialsPanel)
+
+class UpdateCheckPanel(bpy.types.Panel):
+    bl_label = "Addon Update Check"
+    bl_idname = "UPDATE_PT_check"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Tools'
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        if update_available:
+            row.label(text="Update available!", icon='INFO')
+            row.operator("wm.url_open", text="Download Update").url = "https://github.com/ASXGXR/rkmaterials/releases"
+        else:
+            row.label(text="Addon is up to date", icon='CHECKMARK')
 
 def unregister():
     del bpy.types.Scene.imported_materials
@@ -111,5 +145,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
- 
