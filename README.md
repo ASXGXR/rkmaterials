@@ -10,8 +10,8 @@ Blender-addon to import Ryan King's materials into your current .blend file.
 7. You have successfully installed the add-on!
 
 ## BLENDER INSTRUCTIONS
-1. Once in blender, select the "RK Materials" panel on the right of the screen
-2. Select your object
+1. Once in blender, select your object
+2. Select the "RK Materials" panel on the right of the screen
 3. Click "Import Materials"
 4. Click "Apply" on the material you wish to import
 5. You've imported your desired material!
